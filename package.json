@@ -102,25 +102,8 @@
       "unicorn/number-literal-case": "off"
     },
     "space": true,
-    "overrides": [
-      {
-        "plugins": [
-          "prettier",
-          "compat"
-        ],
-        "parserOptions": {
-          "sourceType": "script"
-        },
-        "files": [
-          "lib/**/*.js"
-        ],
-        "envs": [
-          "node"
-        ],
-        "rules": {
-          "compat/compat": "error"
-        }
-      }
+    "ignores": [
+      "lib"
     ]
   }
 }
