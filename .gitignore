@@ -1,4 +1,7 @@
-*.sw[a-p]
-/node_modules/
-yarn-error.log
-yarn.lock
+.DS_Store
+*.log
+.idea
+node_modules
+coverage
+.nyc_output
+lib

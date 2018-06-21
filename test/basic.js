@@ -1,45 +1,53 @@
-/* eslint-disable dot-notation */
-var assert = require('assert');
-var chalk = require('chalk');
-var convert = require('../index');
-var conversions = require('../conversions');
-var keywords = require('color-name');
+const assert = require('assert');
+const chalk = require('chalk');
+const keywords = require('color-name');
 
-var models = Object.keys(conversions);
-for (var len = models.length, i = 0; i < len; i++) {
-	var toModel = models[i];
-	for (var j = 0; j < len; j++) {
-		var fromModel = models[j];
+const conversions = require('../lib/conversions');
+const convert = require('../lib');
 
-		if (toModel === fromModel) {
-			continue;
-		}
+const models = Object.keys(conversions);
+for (let len = models.length, i = 0; i < len; i++) {
+  const toModel = models[i];
+  for (let j = 0; j < len; j++) {
+    const fromModel = models[j];
 
-		var fn = convert[toModel][fromModel];
-		if (fn) {
-			var path = (fn.conversion || [fromModel, toModel]).slice();
-			path[0] = chalk.bold.cyan(path[0]);
-			path[path.length - 1] = chalk.bold.cyan(path[path.length - 1]);
+    if (toModel === fromModel) {
+      continue;
+    }
 
-			console.log(path.join(chalk.bold.black('->')));
-		} else {
-			console.log(chalk.red([toModel, fromModel].join('->')), chalk.red('(no conversion)'));
-		}
-	}
+    const fn = convert[toModel][fromModel];
+    if (fn) {
+      const path = (fn.conversion || [fromModel, toModel]).slice();
+      path[0] = chalk.bold.cyan(path[0]);
+      path[path.length - 1] = chalk.bold.cyan(path[path.length - 1]);
 
-	// should not expose channels
-	assert(convert[toModel].channels > 0);
-	assert(Object.keys(convert[toModel]).indexOf('channels') === -1);
+      console.log(path.join(chalk.bold.black('->')));
+    } else {
+      console.log(
+        chalk.red([toModel, fromModel].join('->')),
+        chalk.red('(no conversion)')
+      );
+    }
+  }
+
+  // should not expose channels
+  assert(convert[toModel].channels > 0);
+  assert(Object.keys(convert[toModel]).indexOf('channels') === -1);
 }
 
 // labels should be unique
-var uniqued = {};
-models.forEach(function (model) {
-	var hash = [].slice.call(convert[model].labels).sort().join('');
-	if (hash in uniqued) {
-		throw new Error('models ' + uniqued[hash] + ' and ' + model + ' have the same label set');
-	}
-	uniqued[hash] = model;
+const uniqued = {};
+models.forEach(model => {
+  const hash = [].slice
+    .call(convert[model].labels)
+    .sort()
+    .join('');
+  if (hash in uniqued) {
+    throw new Error(
+      'models ' + uniqued[hash] + ' and ' + model + ' have the same label set'
+    );
+  }
+  uniqued[hash] = model;
 });
 
 assert.deepEqual(convert.rgb.hsl([140, 200, 100]), [96, 48, 59]);
@@ -58,8 +66,10 @@ assert.deepEqual(convert.rgb.hcg([140, 200, 100]), [96, 39, 65]);
 assert.deepEqual(convert.rgb.apple([255, 127, 0]), [65535, 32639, 0]);
 
 assert.deepEqual(convert.hsl.rgb([96, 48, 59]), [140, 201, 100]);
-assert.deepEqual(convert.hsl.hsv([96, 48, 59]), [96, 50, 79]); // colorpicker says [96,50,79]
-assert.deepEqual(convert.hsl.hwb([96, 48, 59]), [96, 39, 21]); // computer round to 21, should be 22
+// colorpicker says [96,50,79]
+assert.deepEqual(convert.hsl.hsv([96, 48, 59]), [96, 50, 79]);
+// computer round to 21, should be 22
+assert.deepEqual(convert.hsl.hwb([96, 48, 59]), [96, 39, 21]);
 assert.deepEqual(convert.hsl.cmyk([96, 48, 59]), [30, 0, 50, 21]);
 assert.deepEqual(convert.hsl.keyword([240, 100, 50]), 'blue');
 assert.deepEqual(convert.hsl.ansi16([240, 100, 50]), 94);
@@ -127,24 +137,45 @@ assert.deepEqual(convert.hsl.rgb(96, 48, 59), [140, 201, 100]);
 
 // raw functions
 function round(vals) {
-	for (var i = 0; i < vals.length; i++) {
-		vals[i] = vals[i].toFixed(1);
-	}
+  for (let i = 0; i < vals.length; i++) {
+    vals[i] = vals[i].toFixed(1);
+  }
 
-	return vals;
+  return vals;
 }
 
-assert.deepEqual(round(convert.hsl.rgb.raw([96, 48, 59])), [140.4, 200.6, 100.3]);
+assert.deepEqual(round(convert.hsl.rgb.raw([96, 48, 59])), [
+  140.4,
+  200.6,
+  100.3
+]);
 assert.deepEqual(round(convert.rgb.hsl.raw([140, 200, 100])), [96, 47.6, 58.8]);
 
-assert.deepEqual(round(convert.hsv.rgb.raw([96, 50, 78])), [139.2, 198.9, 99.5]);
+assert.deepEqual(round(convert.hsv.rgb.raw([96, 50, 78])), [
+  139.2,
+  198.9,
+  99.5
+]);
 assert.deepEqual(round(convert.rgb.hsv.raw([140, 200, 100])), [96, 50, 78.4]);
 
-assert.deepEqual(round(convert.hwb.rgb.raw([96, 39, 22])), [139.2, 198.9, 99.5]);
+assert.deepEqual(round(convert.hwb.rgb.raw([96, 39, 22])), [
+  139.2,
+  198.9,
+  99.5
+]);
 assert.deepEqual(round(convert.rgb.hwb.raw([140, 200, 100])), [96, 39.2, 21.6]);
 
-assert.deepEqual(round(convert.cmyk.rgb.raw([30, 0, 50, 22])), [139.2, 198.9, 99.5]);
-assert.deepEqual(round(convert.rgb.cmyk.raw([140, 200, 100])), [30, 0, 50, 21.6]);
+assert.deepEqual(round(convert.cmyk.rgb.raw([30, 0, 50, 22])), [
+  139.2,
+  198.9,
+  99.5
+]);
+assert.deepEqual(round(convert.rgb.cmyk.raw([140, 200, 100])), [
+  30,
+  0,
+  50,
+  21.6
+]);
 
 assert.deepEqual(round(convert.keyword.rgb.raw('blue')), [0, 0, 255]);
 assert.deepEqual(convert.rgb.keyword.raw([255, 228, 196]), 'bisque');
@@ -154,27 +185,33 @@ assert.deepEqual(round(convert.hsv.hsl.raw([302, 32, 55])), [302, 19.0, 46.2]);
 assert.deepEqual(round(convert.hsv.hsl.raw([267, 19, 89])), [267, 43.5, 80.5]);
 assert.deepEqual(round(convert.hsv.hsl.raw([267, 91, 95])), [267, 89.6, 51.8]);
 assert.deepEqual(round(convert.hsv.hsl.raw([267, 91, 12])), [267, 83.5, 6.5]);
-assert.deepEqual(round(convert.hsv.hsl.raw([180, 50, 0])), [180, 33.3, 0]); // Preserve saturation
+// Preserve saturation
+assert.deepEqual(round(convert.hsv.hsl.raw([180, 50, 0])), [180, 33.3, 0]);
 
 assert.deepEqual(round(convert.hsl.hsv.raw([96, 48, 59])), [96, 50, 78.7]);
 assert.deepEqual(round(convert.hsl.hsv.raw([120, 54, 61])), [120, 51.3, 82.1]);
 assert.deepEqual(round(convert.hsl.hsv.raw([27, 51, 43])), [27, 67.5, 64.9]);
 assert.deepEqual(round(convert.hsl.hsv.raw([241, 17, 79])), [241, 8.6, 82.6]);
-assert.deepEqual(round(convert.hsl.hsv.raw([120, 50, 0])), [120, 66.7, 0]); // Preserve saturation
+// Preserve saturation
+assert.deepEqual(round(convert.hsl.hsv.raw([120, 50, 0])), [120, 66.7, 0]);
 
 assert.deepEqual(round(convert.xyz.rgb.raw([25, 40, 15])), [97.4, 189.9, 85]);
 assert.deepEqual(round(convert.rgb.xyz.raw([92, 191, 84])), [24.6, 40.2, 14.8]);
 
-assert.deepEqual(round(convert.rgb.lab.raw([92, 191, 84])), [69.6, -50.1, 44.6]);
+assert.deepEqual(round(convert.rgb.lab.raw([92, 191, 84])), [
+  69.6,
+  -50.1,
+  44.6
+]);
 
 // hwb
 // http://dev.w3.org/csswg/css-color/#hwb-examples
 
 // all extreme value should give black, white or grey
-for (var angle = 0; angle <= 360; angle++) {
-	assert.deepEqual(convert.hwb.rgb([angle, 0, 100]), [0, 0, 0]);
-	assert.deepEqual(convert.hwb.rgb([angle, 100, 0]), [255, 255, 255]);
-	assert.deepEqual(convert.hwb.rgb([angle, 100, 100]), [128, 128, 128]);
+for (let angle = 0; angle <= 360; angle++) {
+  assert.deepEqual(convert.hwb.rgb([angle, 0, 100]), [0, 0, 0]);
+  assert.deepEqual(convert.hwb.rgb([angle, 100, 0]), [255, 255, 255]);
+  assert.deepEqual(convert.hwb.rgb([angle, 100, 100]), [128, 128, 128]);
 }
 
 assert.deepEqual(convert.hwb.rgb([0, 0, 0]), [255, 0, 0]);
@@ -193,7 +230,7 @@ assert.deepEqual(convert.hwb.rgb([240, 40, 40]), [102, 102, 153]);
 assert.deepEqual(convert.hwb.rgb([240, 40, 20]), [102, 102, 204]);
 
 // black should always stay black
-var val = [0, 0, 0];
+const val = [0, 0, 0];
 assert.deepEqual(convert.hsl.hsv(val), val);
 assert.deepEqual(convert.hsl.rgb(val), val);
 assert.deepEqual(convert.hsl.hwb(val), [0, 0, 100]);
@@ -206,12 +243,13 @@ assert.deepEqual(convert.rgb.keyword(255, 255, 1), 'yellow');
 assert.deepEqual(convert.rgb.keyword(250, 254, 1), 'yellow');
 
 // assure euclidean distance algorithm produces perfectly inverse results
-for (var k in keywords) {
-	if (keywords.hasOwnProperty(k)) {
-		// why the roundabout testing method? certain css keywords have the same color values.
-		var derived = convert.rgb.keyword(keywords[k]);
-		assert.deepEqual(keywords[derived], keywords[k]);
-	}
+for (const k in keywords) {
+  if (Object.prototype.hasOwnProperty.call(keywords, k)) {
+    // why the roundabout testing method? certain
+    // css keywords have the same color values.
+    const derived = convert.rgb.keyword(keywords[k]);
+    assert.deepEqual(keywords[derived], keywords[k]);
+  }
 }
 
 // basic gray tests
