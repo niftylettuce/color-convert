@@ -17,8 +17,6 @@
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-compat": "^2.4.0",
     "eslint-plugin-prettier": "^2.6.0",
-    "husky": "^0.14.3",
-    "lint-staged": "^7.2.0",
     "prettier": "^1.13.5",
     "remark-cli": "^5.0.0",
     "remark-preset-github": "^0.0.8",
@@ -46,12 +44,6 @@
     "rgb"
   ],
   "license": "MIT",
-  "lint-staged": {
-    "*.{js,jsx,mjs,ts,tsx,css,less,scss,json,graphql}": [
-      "prettier --write --single-quote --trailing-comma none",
-      "git add"
-    ]
-  },
   "main": "lib/index.js",
   "remarkConfig": {
     "plugins": [
@@ -65,7 +57,7 @@
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib",
     "lint": "xo && remark . -qfo && eslint lib",
-    "precommit": "lint-staged && npm test",
+    "precommit": "npm test",
     "test": "npm run build && npm run lint && node test/basic.js"
   },
   "xo": {
